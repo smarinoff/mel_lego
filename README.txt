@@ -1,0 +1,1 @@
+MEL scripts to create Lego components (blocks, wheels, etc.) in Maya, in order to build a Lego car

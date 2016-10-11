@@ -1,0 +1,471 @@
+//dimension constants
+global float $dimW = 0.8; //block width unit
+global float $dimD = 0.8; //block depth unit
+global float $dimH = 0.32; //block height unit
+global float $dimR = 0.25; //nubin/hole radius
+
+//GUI
+string $mywindow = `window -title "Lego Blocks" -menuBar true - widthHeight 483 700`;
+
+menu -label "Basic Options";
+    menuItem -label "New Scene" -command "file -f -new";
+    menuItem -label "Delete Selected" -command "doDelete";
+    
+columnLayout;
+
+    frameLayout -collapsable true -label "Square Block" -width 475 -height 150;
+    
+    columnLayout;
+    
+        intSliderGrp -label "Height" -field true -min 1 -max 20 -value 1 blockHeight;   
+        intSliderGrp -label "Width (Bumps)" -field true -min 1 -max 20 -value 2 blockWidth; 
+        intSliderGrp -label "Depth (Bumps)" -field true -min 1 -max 20 -value 8 blockDepth;
+        
+        colorSliderGrp -label "Colour" -hsv 50 1 1 blockColour;
+        
+        columnLayout;
+        
+            button -label "Create Square Block" -command "squareBlock()";
+            
+        setParent ..;  
+    setParent ..;   
+setParent ..;  
+    
+    frameLayout -collapsable true -label "Square Block with Holes" -width 475 -height 120;
+    
+    columnLayout;
+     
+        intSliderGrp -label "Width (Bumps)" -field true -min 1 -max 20 -value 1 blockWidth2; 
+        intSliderGrp -label "Depth (Bumps)" -field true -min 2 -max 20 -value 8 blockDepth2;
+        
+        colorSliderGrp -label "Colour" -hsv 50 1 1 blockColour2;
+        
+        columnLayout;
+        
+            button -label "Create Square Block with Holes" -command "squareBlockHoles()";
+            
+        setParent ..;
+    setParent ..; 
+setParent ..;
+
+    frameLayout -collapsable true -label "Rounded Block with Holes" -width 475 -height 120;
+    
+    columnLayout;
+     
+        intSliderGrp -label "Width (Bumps)" -field true -min 1 -max 20 -value 1 blockWidth3; 
+        intSliderGrp -label "Depth (Bumps)" -field true -min 2 -max 20 -value 8 blockDepth3;
+        
+        colorSliderGrp -label "Colour" -hsv 200 1 1 blockColour3;
+        
+        columnLayout;
+        
+            button -label "Create Rounded Block with Holes" -command "roundedBlockHoles()";
+            
+        setParent ..;  
+    setParent ..; 
+setParent ..;
+
+    frameLayout -collapsable true -label "Angled Rounded Block with Holes" -width 475 -height 170;
+    
+    columnLayout;
+     
+        intSliderGrp -label "Width (Bumps)" -field true -min 1 -max 20 -value 1 blockWidth4; 
+        intSliderGrp -label "Segment 1 Depth (Bumps)" -field true -min 2 -max 10 -value 3 blockDepth4a;
+        intSliderGrp -label "Segment 2 Depth (Bumps)" -field true -min 2 -max 10 -value 4 blockDepth4b;
+        radioButtonGrp -nrb 2 -sl 1 -label "Angle" -la2 "45 degrees" "90 degrees" blockAngle4;
+        
+        colorSliderGrp -label "Colour" -hsv 200 1 1 blockColour4;
+        
+        columnLayout;
+        
+            button -label "Create Angled Rounded Block with Holes" -command "roundedBlockHolesAngle()";
+            
+        setParent ..;
+    setParent ..; 
+setParent ..;
+
+    frameLayout -collapsable true -label "Wheel & Hub" -width 475 -height 170;
+    
+    columnLayout;
+     
+        intSliderGrp -label "Width (Bumps)" -field true -min 1 -max 10 -value 1 blockWidth5; 
+        intSliderGrp -label "Tire Thickness" -field true -min 1 -max 10 -value 3 tireThickness5;
+        intSliderGrp -label "Hub Radius" -field true -min 1 -max 10 -value 1 hubRadius5;
+        
+        colorSliderGrp -label "Tire Colour" -hsv 120 0 0.1 tireColour5;
+        colorSliderGrp -label "Hub Colour" -hsv 120 0 0.6 hubColour5;
+        
+        columnLayout;
+        
+            button -label "Create Wheel and Hub" -command "wheelAndHub()";
+            
+        setParent ..;
+    setParent ..; 
+setParent ..;
+
+    frameLayout -collapsable true -label "Axel" -width 475 -height 120;
+    
+    columnLayout;
+     
+        intSliderGrp -label "Length" -field true -min 1 -max 20 -value 1 blockWidth6;
+        
+        colorSliderGrp -label "Axel Colour" -hsv 120 0 0.6 blockColour6;
+        
+        columnLayout;
+        
+            button -label "Create Axel" -command "axel()";
+            
+        setParent ..;
+    setParent ..; 
+setParent ..;
+    
+showWindow $mywindow;
+
+//GUI functions
+
+global proc squareBlock()
+{
+    int $blockW = `intSliderGrp -q -value blockWidth`;
+    int $blockH = `intSliderGrp -q -value blockHeight`;
+    int $blockD = `intSliderGrp -q -value blockDepth`;
+    
+    float $rgb[3] = `colorSliderGrp -q -rgbValue blockColour`;
+    
+    createSquareBlock($blockW, $blockH, $blockD, $rgb, 0); //0 for holes false
+}
+
+global proc squareBlockHoles()
+{
+    int $blockH = 3;
+    int $blockW = `intSliderGrp -q -value blockWidth2`;
+    int $blockD = `intSliderGrp -q -value blockDepth2`;
+    
+    float $rgb[3] = `colorSliderGrp -q -rgbValue blockColour2`;
+    
+    createSquareBlock($blockW, $blockH, $blockD, $rgb, 1); //1 for holes true
+}
+
+global proc roundedBlockHoles()
+{
+    int $blockH = 3;
+    int $blockW = `intSliderGrp -q -value blockWidth3`;
+    int $blockD = `intSliderGrp -q -value blockDepth3`;
+    
+    float $rgb[3] = `colorSliderGrp -q -rgbValue blockColour3`;
+    
+    createRoundedBlockHoles($blockW, $blockH, $blockD, $rgb);
+}
+
+global proc roundedBlockHolesAngle()
+{
+    int $blockH = 3;
+    int $blockW = `intSliderGrp -q -value blockWidth4`;
+    int $blockDA = `intSliderGrp -q -value blockDepth4a`;
+    int $blockDB = `intSliderGrp -q -value blockDepth4b`;
+    
+    int $blockA = `radioButtonGrp -q -sl blockAngle4`; //1 == 45, 2 == 90
+    
+    float $rgb[3] = `colorSliderGrp -q -rgbValue blockColour4`;
+    
+    createRoundedBlockHolesAngle($blockW, $blockH, $blockDA, $blockDB, $blockA, $rgb);
+}
+
+global proc wheelAndHub()
+{
+    int $blockH = `intSliderGrp -q -value blockWidth5`; 
+    int $tireW = `intSliderGrp -q -value tireThickness5`;
+    int $hubR = `intSliderGrp -q -value hubRadius5`;
+        
+    float $tireRGB[3] = `colorSliderGrp -q -rgbValue tireColour5`;
+    float $hubRGB[3] = `colorSliderGrp -q -rgbValue hubColour5`;
+    
+    createHub($hubR, $blockH, $hubRGB);
+    createWheel($tireW, $hubR, $blockH, $tireRGB);
+}
+
+global proc axel()
+{
+    int $blockH = `intSliderGrp -q -value blockWidth6`;
+    float $rgb[3] = `colorSliderGrp -q -rgbValue blockColour6`;
+    
+    createAxel($blockH, $rgb);
+}
+
+//Block building sequences
+
+proc createSquareBlock(int $blockW, int $blockH, int $blockD, float $rgb[], int $addHoles)
+{
+    string $namespace_tmp = initNamespace();
+
+    createBlock($blockW, $blockH, $blockD);
+    if($addHoles == 1)
+        basicHoles($blockW, $blockD, $namespace_tmp);    
+    addNubins($blockW, $blockH, $blockD);
+    
+    createShader($rgb, $namespace_tmp, "blinn");
+    
+    polyUnite -n $namespace_tmp -ch 1 ($namespace_tmp + ":*");
+    
+    closeNamespace($namespace_tmp);
+}
+
+proc createRoundedBlockHoles(int $blockW, int $blockH, int $blockD, float $rgb[])
+{
+    global float $dimH, $dimW, $dimD, $dimR;
+
+    string $namespace_tmp = initNamespace();
+    
+    createBlock($blockW, $blockH, $blockD);
+    basicHoles($blockW, $blockD, $namespace_tmp);
+    
+    int $i = $blockD - 1;    
+    
+    $i = addRoundedEnd($blockW, $blockH, $blockD, $namespace_tmp, $i); //end at +z
+    $i = addRoundedEnd($blockW, $blockH, ($blockD * (-1)), $namespace_tmp, $i); //end at -z
+    
+    createShader($rgb, $namespace_tmp, "blinn");
+    
+    rename ($namespace_tmp + ":block_" + $i) $namespace_tmp; //found out about rename at: http://nickpisca.com/sherpa/?p=336
+    select ($namespace_tmp + ":" + $namespace_tmp);
+    
+    closeNamespace($namespace_tmp); 
+}
+
+proc createRoundedBlockHolesAngle(int $blockW, int $blockH, int $blockDA, int $blockDB, float $blockA, float $rgb[])
+{
+    global float $dimH, $dimW, $dimD, $dimR;
+
+    //create first segment and store name
+    select -cl;
+    createRoundedBlockHoles($blockW, $blockH, $blockDA, $rgb);
+    string $name1[] = `ls -sl`;
+    
+    //create second segment and store name
+    select -cl;    
+    createRoundedBlockHoles($blockW, $blockH, $blockDB, $rgb);
+    string $name2[] = `ls -sl`;    
+    
+    float $angle;       
+    
+    if($blockA == 1)
+        $angle = 45;
+    else
+        $angle = 90;
+    
+    //position second segment
+    move -a -moveZ (((-$dimD * $blockDB) / 2.0) + ((-$dimD * $blockDA) / 2.0));
+    rotate -p 0 (($dimH * $blockH) / 2.0) ((-$dimD * $blockDA) / 2.0) -a $angle 0 0; //Meagan told me about rotation pivot points!   
+
+    string $name = randomName();
+
+    polyUnite -n $name $name1[0] $name2[0];
+}
+
+proc createHub(int $hubR, int $blockH, float $rgb[])
+{
+    global float $dimR, $dimW;
+
+    string $namespace_tmp = initNamespace();
+    
+    createTube(($hubR * $dimW), ($blockH * $dimW), $dimR, $namespace_tmp, 5);
+    
+    //add holes
+    int $i;
+    for($i = 0; $i < 5; $i++)
+    {
+        polyCylinder -r ($dimR * $hubR) -h ($blockH * $dimW) -name ("hole_" + $i);
+        move -a -moveZ ( (($hubR * $dimW) / 2) - (($dimR * $hubR) / 6.5));
+        move -a -moveX (($hubR * $dimW) / 2 - (($dimR * $hubR) / 6.5));
+        rotate -p 0 0 0 -a 0 ($i * 72) 0;
+        
+        polyBoolOp -op 2 -n ("block_" + ($i + 1)) ($namespace_tmp + ":block_" + $i) ($namespace_tmp + ":hole_" + $i);
+    }    
+    
+    createShader($rgb, $namespace_tmp, "blinn");
+    
+    rename ($namespace_tmp + ":block_" + $i) $namespace_tmp; 
+    select ($namespace_tmp + ":" + $namespace_tmp);
+    
+    closeNamespace($namespace_tmp);
+}
+
+proc createWheel(int $tireW, int $hubR, int $blockH, float $rgb[])
+{
+    global float $dimW, $dimH;
+    
+    string $namespace_tmp = initNamespace();    
+    
+    createTube( (($hubR * $dimW) + ($tireW * 0.2)), ($blockH * $dimW), ($hubR * $dimW), $namespace_tmp, 1 );
+    
+    select -cl;    
+    
+    //make wheels fancy now
+    int $i;
+    
+    //rounder wheels
+    for($i = 140; $i<180; $i++)
+    {
+        select -tgl ($namespace_tmp + ":block_0.f[" + $i + "]");
+    }
+    scale -r -p 0 0 0 1.06 1.06 1.06; //rounder wheel shape
+    select -cl;  
+    
+    //treads!
+    for($i = 120; $i < 160; $i += 2)
+    {
+        select -tgl ($namespace_tmp + ":block_0.f[" + $i + "]");
+    }  
+    for($i = 161; $i < 201; $i += 2)
+    {
+        select -tgl ($namespace_tmp + ":block_0.f[" + $i + "]");
+    }
+    polyExtrudeFacet -lt 0 0 0.2 -constructionHistory 1 -keepFacesTogether 1 -pvx -1.192092896e-007 -pvy 0 -pvz -1.788139343e-007 -divisions 1 -twist 0 -taper 1 -off 0 -smoothingAngle 30;    
+    scale -r -p 0 0 0 1 0.8 1;    
+    
+    //finish wheel
+    createShader($rgb, $namespace_tmp, "lambert");
+    
+    rename ($namespace_tmp + ":block_0") $namespace_tmp; 
+    select ($namespace_tmp + ":" + $namespace_tmp);    
+    
+    closeNamespace($namespace_tmp);
+}
+
+proc createAxel(int $blockW, float $rgb[])
+{
+    global float $dimW, $dimR;
+    
+    string $namespace_tmp = initNamespace(); 
+    
+    polyCylinder -r $dimR -h ($blockW * $dimW);
+    scale -a 0.25 1 1;
+    polyCylinder -r $dimR -h ($blockW * $dimW);
+    scale -a 1 1 0.25;
+    
+    createShader($rgb, $namespace_tmp, "blinn");
+    
+    polyUnite -n $namespace_tmp -ch 1 ($namespace_tmp + ":*");
+    
+    closeNamespace($namespace_tmp);
+}
+
+//Base procedures, used by different block procedures
+
+proc string initNamespace()
+{
+    string $namespace_tmp = randomName();
+    
+    select -cl;
+    
+    namespace -add $namespace_tmp;
+    namespace -set $namespace_tmp;
+    
+    return $namespace_tmp;
+}
+
+proc string randomName()
+{
+    int $rnd = `rand 10000`;
+    string $name = "Block_" + $rnd;
+    
+    return $name;
+}
+
+proc createBlock(int $w, int $h, int $d)
+{
+    global float $dimH, $dimW, $dimD; //global vars need to be inited everywhere: http://accad.osu.edu/~aprice/courses/694/variables.html
+
+    polyCube -h ($h * $dimH) -w ($w * $dimW) -d ($d * $dimD) -n "block_0" -sz $d;
+    
+    move -a -moveY (($h * $dimH) / 2.0);
+}
+
+proc createTube(float $r, float $h, float $r2, string $obj, int $subDivZ)
+{
+    global float $dimW;
+    
+    polyCylinder -r $r -h ($h * $dimW) -sy 4 -sz $subDivZ -n "outer";
+    polyCylinder -r $r2 -h ($h * $dimW) -sy 4 -sz $subDivZ -n "inner";
+    
+    polyBoolOp -op 2 -name "block_0" ($obj + ":outer") ($obj + ":inner");
+}
+
+proc addNubins(int $w, int $h, int $d)
+{
+    global float $dimH, $dimW, $dimD, $dimR;
+
+    int $i, $j;
+
+    for($i = 0; $i < $w; $i++)
+    {
+        for($j = 0; $j < $d; $j++)
+        {
+            polyCylinder -r $dimR -h 0.20;
+            move -a -moveY ($h*$dimH + 0.10);
+            move -a -moveX (($i * $dimW) - (($w*$dimW) / 2.0) + ($dimW/2.0));
+            move -a -moveZ (($j * $dimD) - (($d*$dimD) / 2.0) + ($dimD/2.0));
+        }
+    }
+}
+
+proc basicHoles(int $w, int $d, string $obj)
+{
+    global float $dimH, $dimW, $dimD, $dimR;
+
+    int $i;
+    
+    for($i = 0; $i < $d - 1; $i++)
+    {
+        polyCylinder -r $dimR -h $w -name ("hole_" + $i);
+        rotate -a 0 0 90deg;
+        move -a -moveZ (($i * $dimD) - (($d*$dimD) / 2.0) + $dimD);
+        move -a -moveY ($dimH * 1.5);
+        
+        polyBoolOp -op 2 -name ("block_" + ($i + 1)) ($obj + ":block_" + $i) ($obj + ":hole_" + $i);
+    }
+}
+
+proc int addRoundedEnd(int $w, int $h, int $d, string $obj, int $blockNum)
+{
+    global float $dimW, $dimH, $dimR;
+ 
+    //end
+    polyCylinder -r (($h * $dimH) / 2.0) -h ($dimW * $w) -name ("end_" + $blockNum);
+    positionRoundedEnd($d, $h);
+    polyBoolOp -op 1 -name ("block_" + ($blockNum + 1)) ($obj + ":block_" + $blockNum) ($obj + ":end_" + $blockNum);
+    
+    $blockNum++;    
+    
+    //hole
+    polyCylinder -r $dimR -h $w -name ("hole_" + $blockNum);
+    positionRoundedEnd($d, $h);
+    polyBoolOp -op 2 -name ("block_" + ($blockNum + 1)) ($obj + ":block_" + $blockNum) ($obj + ":hole_" + $blockNum);
+    
+    $blockNum++;    
+    
+    return ($blockNum);
+}
+
+proc positionRoundedEnd(int $d, int $h)
+{
+    global float $dimH, $dimD;
+    
+    rotate -a 0 0 90deg;
+    move -a -moveZ (($d * $dimD) / 2.0);
+    move -a -moveY (($h * $dimH) / 2.0);
+}
+
+proc createShader(float $color[], string $obj, string $shader)
+{
+    shadingNode -asShader $shader -name "blockMaterial";
+    setAttr ($obj + ":blockMaterial.color") -type double3 $color[0] $color[1] $color[2];
+}
+
+proc closeNamespace(string $obj)
+{
+    delete -ch;
+    
+    hyperShade -assign ($obj + ":blockMaterial");
+    
+    namespace -set ":";
+}
